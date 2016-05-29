@@ -12,12 +12,16 @@ TEMPLATE = app
 SOURCES += main.cpp \
     imagedenoising.cpp \
     utils.cpp \
-    nlm_filter_classic.cpp
+    nlm_filter_classic.cpp \
+    nlm_filter_random.cpp \
+    ../addnoise/awgn.cpp
 
 HEADERS += \
     imagedenoising.h \
     utils.h \
-    nlm_filter_classic.h
+    nlm_filter_classic.h \
+    nlm_filter_random.h \
+    ../addnoise/awgn.h
 
 DESTDIR = ../bin
 

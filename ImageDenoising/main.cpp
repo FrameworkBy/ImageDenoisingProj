@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <nlm_filter_classic.h>
+#include <nlm_filter_random.h>
 
 using namespace std;
 
@@ -32,6 +33,9 @@ int main(int argc, char *argv[])
                                    QCoreApplication::translate("main", "Option <sigma>."),
                                    QCoreApplication::translate("main", "sigma"));
 
+    QCommandLineOption randomSearchOption(QStringList() << "r" << "random",
+                                         QCoreApplication::translate("main", "Use random search."));
+
     QCommandLineOption cudaOption(QStringList() << "c" << "cuda",
                                   QCoreApplication::translate("main", "Use CUDA."));
 
@@ -39,6 +43,7 @@ int main(int argc, char *argv[])
     parser.addOption(inputImageOption);
     parser.addOption(outputImageOption);
     parser.addOption(sigmaOption);
+    parser.addOption(randomSearchOption);
     parser.addOption(cudaOption);
     parser.process(a);
 
@@ -55,6 +60,8 @@ int main(int argc, char *argv[])
 
     float sigma = parser.value(sigmaOption).toFloat();
 
+    bool random = parser.isSet(randomSearchOption);
+
     bool cuda = parser.isSet(cudaOption);
 
     QImageReader* imageInputReader = new QImageReader(inputImageName);
@@ -63,7 +70,10 @@ int main(int argc, char *argv[])
 
     QImage* imageFiltered = new QImage(imageInput->size(), QImage::Format_RGB32);
 
-    nlm_filter_classic(imageInput, imageFiltered, sigma, cuda);
+    if (!random)
+        nlm_filter_classic(imageInput, imageFiltered, sigma, cuda);
+    else
+        nlm_filter_random(imageInput, imageFiltered, sigma, cuda);
 
     QImageWriter* imageWriterFiltered = new QImageWriter();
     imageWriterFiltered->setFileName(outputImageName);
