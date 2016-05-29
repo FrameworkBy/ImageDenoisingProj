@@ -23,4 +23,6 @@ DESTDIR = ../bin
 
 QMAKE_CXXFLAGS += /openmp
 
+CONFIG(release, debug|release) {
 include(cuda.pri)
+}

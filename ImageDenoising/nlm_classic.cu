@@ -36,7 +36,10 @@ __global__ void nlm_classic_global(const float* d_src,
 
     const int ix = blockDim.x * blockIdx.x + threadIdx.x;
     const int iy = blockDim.y * blockIdx.y + threadIdx.y;
-    if (ix < width && iy < height)
+
+    int w = width - (patch*2+1)+1;
+    int h = height - (patch*2+1)+1;
+    if (ix < width-patch*2 && iy < height-patch*2)
     {
         int i1 = ix+patch;
         int j1 = iy+patch;
@@ -46,9 +49,9 @@ __global__ void nlm_classic_global(const float* d_src,
         float sweight = 0;
 
         int rmin = Max(i1-window,patch);
-        int rmax = Min(i1+window,width+patch);
+        int rmax = Min(i1+window,w+patch);
         int smin = Max(j1-window,patch);
-        int smax = Min(j1+window,height+patch);
+        int smax = Min(j1+window,h+patch);
 
         for (int r = rmin; r < rmax; r++) {
             for (int s = smin; s < smax; s++) {
@@ -86,6 +89,7 @@ __global__ void nlm_classic_global(const float* d_src,
             d_dst[width*j1+i1] = d_src[width*j1+i1];
         }
     }
+    __syncthreads();
 }
 
 void nlm_filter_classic_CUDA(const float* h_src, float* h_dst, int width, int height, float fSigma, float fParam, int patch, int window) {
