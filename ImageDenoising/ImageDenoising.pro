@@ -13,8 +13,9 @@ SOURCES += main.cpp \
     imagedenoising.cpp \
     utils.cpp \
     nlm_filter_classic.cpp \
-    nlm_filter_random.cpp \
-    ../addnoise/awgn.cpp
+    ../addnoise/awgn.cpp \
+#    nlm_filter_random_old.cpp \
+    nlm_filter_random.cpp
 
 HEADERS += \
     imagedenoising.h \
