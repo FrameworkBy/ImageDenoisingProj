@@ -23,9 +23,9 @@ __device__ float Max2(float x, float y)
     return (x > y) ? x : y;
 }
 
-__device__ int XX[500*500][128];
-__device__ int YY[500*500][128];
-__device__ float DD[500*500][128];
+__device__ int XX[300*300][128];
+__device__ int YY[300*300][128];
+__device__ float DD[300*300][128];
 
 __device__ void mSort(int w, int x, int y, int N) {
     int xy = w*y+x;
@@ -120,6 +120,8 @@ __global__ void nlm_filter_random_global(const float *d_src, float* d_dst,
 
         int iSigmaS = width / searchRadius;
 
+        steps = 1;
+
         float fSigma2 = fSigma * fSigma;
         float fH = fParam * fSigma;
         float fH2 = fH * fH;
@@ -145,6 +147,9 @@ __global__ void nlm_filter_random_global(const float *d_src, float* d_dst,
                 Y[i] = rr.y;
                 DIST[i] = dist;
 
+//                XX[xy][i] = rr.x;
+//                YY[xy][i] = rr.y;
+//                DD[xy][i] = dist;
             }
 //            mSort(X, Y, DIST, QUEUE_SIZE);
 
@@ -153,7 +158,7 @@ __global__ void nlm_filter_random_global(const float *d_src, float* d_dst,
 
             for (int N = 0; N < 1; N++) {
                 for (int jj = 0; jj < maxJ*15; jj++) {
-                    int2 rr = get_random_pixel(i1, j1,
+                /*    int2 rr = get_random_pixel(i1, j1,
                                                width+patchRadius-1, height+patchRadius-1, patchRadius, patchRadius,
                                                iSigmaS, jj);
 //                    int2 rr;rr.x=2;rr.y=3;
@@ -180,7 +185,7 @@ __global__ void nlm_filter_random_global(const float *d_src, float* d_dst,
 
                 fDif = Max2(fDif - 2.0 * (float) icwl *  fSigma2, 0.0);
                 fDif = fDif / fH2;
-                float W = exp(-fDif);
+                float W = expf(-fDif);
 
                 if (W > wmax) {
                     wmax = W;

@@ -22,7 +22,9 @@ HEADERS += \
     utils.h \
     nlm_filter_classic.h \
     nlm_filter_random.h \
-    ../addnoise/awgn.h
+    ../addnoise/awgn.h \
+    helper_cuda.h \
+    helper_string.h
 
 DESTDIR = ../bin
 

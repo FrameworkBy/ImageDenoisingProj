@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     calcMsePsnr(&mse, &psnr, imageInput0, imageInput1, imageInput1->size());
 
-    printf("MSE: %f\nPSNR: %f\n", mse, psnr);
+    printf("%f,%f\n", mse, psnr);
 
     a.exit(0);
     return 0;

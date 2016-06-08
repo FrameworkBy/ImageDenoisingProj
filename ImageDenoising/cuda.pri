@@ -4,7 +4,7 @@ SYSTEM_TYPE = 32
 ## CUDA_COMPUTE_ARCH - This will enable nvcc to compiler appropriate architecture specific code for different compute versions.
 ## Multiple architectures can be requested by using a space to seperate. example:
 ## CUDA_COMPUTE_ARCH = 10 20 30 35
-CUDA_COMPUTE_ARCH = 35
+CUDA_COMPUTE_ARCH = 30
 
 ## CUDA_DEFINES - The seperate defines needed for the cuda device and host methods
 CUDA_DEFINES +=
@@ -14,7 +14,8 @@ CUDA_DIR= "c:/CUDA/SDK_7.5"
 
 ## CUDA_SOURCES - the source (generally .cu) files for nvcc. No spaces in path names
 CUDA_SOURCES += nlm_classic.cu \
-                nlm_random.cu
+                nlm_random.cu \
+                nlm_classic3.cu
 
 ## CUDA_LIBS - the libraries to link
 CUDA_LIBS= -lcuda -lcudart -lcurand
@@ -41,8 +42,8 @@ win32:{
   CUDA_LIBS_DIR = "$$CUDA_DIR/lib/Win32"
   QMAKE_LFLAGS += /LIBPATH:\"$$CUDA_DIR/lib/Win32\"
   LIBS += -lcuda -lcudart
-
-  win32-msvc2012:contains(QMAKE_TARGET.arch, x86_64):{
+  NVCC_OPTIONS += -Xcompiler /EHsc,/O2,/MT,/openmp
+  win32-msvc2013:contains(QMAKE_TARGET.arch, x86_32):{
        #Can also set SYSTEM_TYPE here
        CONFIG(debug, debug|release) {
             #Debug settings
@@ -53,10 +54,10 @@ win32:{
         }
         else {
             #Release settings
-            message("Using x64 Release arch config MSVC2012 for build")
+            message("Using x32 Release arch config MSVC2013 for build")
             #read as: --compiler-options options,... + ISO-standard C++ exception handling
             # + speed over size, + code generation multi-threaded
-            NVCC_OPTIONS += -Xcompiler /EHsc,/O2,/MT
+            NVCC_OPTIONS += -Xcompiler /EHsc,/O2,/MT,/openmp
         }
 }
 }

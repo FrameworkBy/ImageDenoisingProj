@@ -238,14 +238,16 @@ void nlm_filter_random_private(float** fImI, float** fImO, int iWidth, int iHeig
 
                         }
                     }
+                    pq.sort();
 
 
                     float wmax = 0;
                     float average = 0;
                     float sweight = 0;
 
-                    for (size_t i = 0; i < pq.size(); i++) {
+                    for (size_t i = 0; i < QUEUE_SIZE; i++) {
                         PatchDist pd = pq.front(); pq.pop_front();
+//                        PatchDist pd = pq.back(); pq.pop_back();
 
                         float fDif = pd.fDist;
 
