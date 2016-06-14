@@ -16,6 +16,9 @@
 #include <cmath>
 #include <vector>
 #include <queue>
+#include <chrono>
+
+using namespace std::chrono;
 
 #define GENERATOR std::default_random_engine
 #define DISTRIB std::normal_distribution<float>
@@ -26,12 +29,6 @@
 #define RAND_SEARCH_STEPS 25 //25
 #define SEARCH_RADIUS 10 //10
 #define FPARAM 0.4f
-
-void nlm_filter_random_CUDA(const float* h_src, float* h_dst,
-                            int width, int height,
-                            float fSigma, float fParam,
-                            int patchRadius, int searchRadius,
-                            int queueSize, int steps);
 
 void image2array(QImage* input, float** output);
 void array2image(float** input, QImage* output, int iWidth, int iHeight);
@@ -140,30 +137,17 @@ void nlm_filter_random(QImage* input, QImage* output, float fSigma, bool cuda) {
 
 
     fArrClean(output_array,iWidth,iHeight,0.0f);
-    T_START
-    if (cuda) {
-        /* Creating arrays for processing on device */
-        float* h_input = new float[incHeight*incWidth];
-        float* h_output = new float[incHeight*incWidth];
 
-        for (int i = 0; i < incWidth; i++) {
-            for (int j = 0; j < incHeight; j++) {
-                h_output[incWidth*j+i] = 0;
-                h_input[incWidth*j+i] = increasedImage[i][j];
-            }
-        }
-        nlm_filter_random_CUDA(h_input, h_output,incWidth,incHeight,fSigma,FPARAM,PATCH_RADIUS,SEARCH_RADIUS,QUEUE_SIZE,STEPS);
-        for (int i = 0; i < iWidth; i++) {
-            for (int j = 0; j < iHeight; j++) {
-                output_array[i][j] = h_output[incWidth*(j+PATCH_RADIUS)+(i+PATCH_RADIUS)];
-            }
-        }
-    } else {
-        nlm_filter_random_private(increasedImage, output_array, iWidth, iHeight, fSigma, iK);
-    }
-    T_END
 
-            array2image(output_array, output, iWidth, iHeight);
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
+    nlm_filter_random_private(increasedImage, output_array, iWidth, iHeight, fSigma, iK);
+
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    auto duration = duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
+    std::cout << duration << std::endl;
+
+    array2image(output_array, output, iWidth, iHeight);
 
     for (int i = 0; i < iWidth; i++) {
         delete []input_array[i];
@@ -247,7 +231,6 @@ void nlm_filter_random_private(float** fImI, float** fImO, int iWidth, int iHeig
 
                     for (size_t i = 0; i < QUEUE_SIZE; i++) {
                         PatchDist pd = pq.front(); pq.pop_front();
-//                        PatchDist pd = pq.back(); pq.pop_back();
 
                         float fDif = pd.fDist;
 

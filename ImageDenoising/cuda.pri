@@ -13,9 +13,7 @@ CUDA_DEFINES +=
 CUDA_DIR= "c:/CUDA/SDK_7.5"
 
 ## CUDA_SOURCES - the source (generally .cu) files for nvcc. No spaces in path names
-CUDA_SOURCES += nlm_classic.cu \
-                nlm_random.cu \
-                nlm_classic3.cu
+CUDA_SOURCES += nlm_classic.cu
 
 ## CUDA_LIBS - the libraries to link
 CUDA_LIBS= -lcuda -lcudart -lcurand

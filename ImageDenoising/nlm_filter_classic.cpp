@@ -19,10 +19,6 @@ void nlm_filter_classic_private
 // Forward declare the function in the .cu file
 void nlm_filter_classic_CUDA
 (float* h_src, float* h_dst, int width, int height, float fSigma, float fParam, int patch, int window);
-void nlm_filter_classic_CUDA2
-(float* h_src, float* h_dst, int width, int height, float fSigma, float fParam, int patch, int window);
-void nlm_filter_classic_CUDA3
-(float* h_src, float* h_dst, int width, int height, float fSigma, float fParam, int patch, int window);
 #endif
 
 
@@ -54,9 +50,9 @@ void nlm_filter_classic(QImage* imageNoise,
         fParam = 0.30f;
     }
 
-    halfPatchSize = 3;
-    halfWindowSize = 17;
-    fParam = 0.30f;
+//    halfPatchSize = 3;
+//    halfWindowSize = 17;
+//    fParam = 0.30f;
 
 
     /* SIZES */
@@ -90,8 +86,6 @@ void nlm_filter_classic(QImage* imageNoise,
     nlm_increse_image2(colorInput, increasedImage, imageSize, halfPatchSize);
 
     /* Creating arrays for processing on device */
-//    float* h_input = new float[incHeight*incWidth];
-//    float* h_output = new float[incHeight*incWidth];
     size_t nBytes = sizeof(float)*(incHeight*incWidth);
     float *h_input, *h_output;
     checkCudaErrors(cudaMallocHost((void**)&h_input, nBytes));
@@ -112,10 +106,8 @@ void nlm_filter_classic(QImage* imageNoise,
     }
     else {
 #ifndef QT_DEBUG
-        nlm_filter_classic_CUDA3
+        nlm_filter_classic_CUDA
                 (h_input, h_output, incWidth, incHeight, fSigma, fParam, halfPatchSize, halfWindowSize);
-//        nlm_filter_classic_CUDA2
-//                (h_input, h_output, incWidth, incHeight, fSigma, fParam, halfPatchSize, halfWindowSize);
 #endif
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
@@ -147,8 +139,6 @@ void nlm_filter_classic(QImage* imageNoise,
     delete []colorOutput;
     delete []colorInput;
     delete []increasedImage;
-//    delete []h_input;
-//    delete []h_output;
     cudaFreeHost(h_input);
     cudaFreeHost(h_output);
     cudaDeviceReset();
@@ -165,14 +155,13 @@ void nlm_filter_classic_private(const float* h_input, float* h_output, int incWi
 
     int w1 = incWidth - (halfPatchSize*2+1) + 1;
     int h1 = incHeight - (halfPatchSize*2+1) + 1;
-//    int h = incHeight;
     int w = incWidth;
 #ifndef QT_DEBUG
-//#pragma omp parallel shared(h_input, h_output)
+#pragma omp parallel shared(h_input, h_output)
 #endif
     {
 #ifndef QT_DEBUG
-//#pragma omp for schedule(dynamic) nowait
+#pragma omp for schedule(dynamic) nowait
 #endif
         for (int i = 0; i < incWidth-halfPatchSize*2; i++) {
             for (int j = 0; j < incHeight-halfPatchSize*2; j++) {
